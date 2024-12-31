@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union, List
 
 
-def query_manager(
+def run_sql_queries(
         query_dir: Union[str, os.PathLike],
         db_file: Union[str, os.PathLike],
         output_dir: Union[str, os.PathLike],

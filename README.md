@@ -32,21 +32,21 @@ This makes it ideal for projects involving multiple interdependent queries, such
 Here’s a minimal example of how to use `query_manager`:
 
 ```python
-from sqlite_query_manager import query_manager
+from sqlite_query_manager import run_sql_queries 
 
 query_dir = "sql_queries"          # Directory containing SQL files
 db_file = "data/online_retail.db"  # SQLite database file
 output_dir = "output"              # Directory to store query results
 
 # Run all queries, skipping those with existing outputs
-query_manager(
+run_sql_queries (
   query_dir,
   db_file,
   output_dir
 )
 
 # Rerun all queries regardless of existing outputs
-query_manager(
+run_sql_queries (
   query_dir,
   db_file,
   output_dir,
@@ -54,7 +54,7 @@ query_manager(
 )
 
 # Rerun specific queries
-query_manager(
+run_sql_queries (
   query_dir,
   db_file,
   output_dir,

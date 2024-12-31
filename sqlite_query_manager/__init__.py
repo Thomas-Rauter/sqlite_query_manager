@@ -1,3 +1,3 @@
-from .query_manager import query_manager
+from .run_sql_queries import run_sql_queries
 
-__all__ = ["query_manager"]
+__all__ = ["run_sql_queries"]
