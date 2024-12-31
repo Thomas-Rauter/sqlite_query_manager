@@ -12,11 +12,7 @@ setup(
     license="MIT",
     packages=find_packages(),
     install_requires=[
-        "pandas>=1.3.0",
-        "sqlite3>=2.6.0",
-        "numpy>=1.20.0",
-        "logging>=0.5.1.2",
-        "pathlib>=1.0.1"
+        "pandas>=2.0.0",
     ],
     python_requires=">=3.7",             # Minimum Python version
     classifiers=[                        # Metadata for PyPI

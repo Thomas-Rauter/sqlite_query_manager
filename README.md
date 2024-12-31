@@ -108,7 +108,7 @@ query_manager(query_dir, db_file, output_dir, rerun_queries=["query1.sql", "quer
 Install directly from GitHub:
 
 ```bash
-pip install git+https://github.com/Thomas-Rauter/sqlite_query_manager.git@v0.1.0
+
 ```
 
 For any issues or feature requests, please open an issue on the [GitHub 
