@@ -64,7 +64,7 @@ query_manager(
 
 ### Directory Layouts
 
-# Input Directory (SQL Queries):
+##### Input Directory (SQL Queries):
 ```text
 sql_queries/
 ├── stage1/
@@ -84,7 +84,7 @@ output/
 │   └── query4.csv
 ```
 
-# The `query_manager` mirrors the structure of the input directory for outputs, ensuring a clean and organized workflow.
+The `query_manager` mirrors the structure of the input directory for outputs, ensuring a clean and organized workflow.
 
 ### Rerun Options
 
@@ -108,7 +108,7 @@ query_manager(query_dir, db_file, output_dir, rerun_queries=["query1.sql", "quer
 Install directly from GitHub:
 
 ```bash
-pip install git+https://github.com/Thomas-Rauter/sqlite_query_manager.git@0.1.0
+pip install git+https://github.com/Thomas-Rauter/sqlite_query_manager.git@v0.1.0
 ```
 
 For any issues or feature requests, please open an issue on the [GitHub 
