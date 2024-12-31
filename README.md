@@ -1,6 +1,7 @@
-# Query Manager
+# SQLite Query Manager
 
-`query_manager` is a Python package designed to efficiently manage and execute SQL queries on SQLite databases. The package supports organizing SQL queries in directories, running them sequentially or selectively, and exporting the results as CSV files. It also includes flexible options to rerun all queries, specific queries, or skip those with existing outputs.
+`sqlite_query_manager` is a Python package designed to efficiently manage and 
+execute SQL queries on SQLite databases. The package supports organizing SQL queries in directories, running them sequentially or selectively, and exporting the results as CSV files. It also includes flexible options to rerun all queries, specific queries, or skip those with existing outputs.
 
 ## Table of Contents
 
@@ -15,7 +16,7 @@
 
 ## Introduction
 
-The `query_manager` package simplifies SQL query execution workflows by:
+The `sqlite_query_manager` package simplifies SQL query execution workflows by:
 - Recursively processing SQL queries from directories.
 - Mirroring directory structures for outputs.
 - Avoiding redundant execution of queries unless explicitly specified.
@@ -29,7 +30,7 @@ This makes it ideal for projects involving multiple interdependent queries, such
 
 ### Basic Example
 
-Here’s a minimal example of how to use `query_manager`:
+Here’s a minimal example of how to use the `run_sql_queries` function:
 
 ```python
 from sqlite_query_manager import run_sql_queries 
@@ -84,32 +85,18 @@ output/
 │   └── query4.csv
 ```
 
-The `query_manager` mirrors the structure of the input directory for outputs, ensuring a clean and organized workflow.
-
-### Rerun Options
-
-#### Default Behavior
-- By default, `query_manager` skips queries whose outputs already exist in the output directory.
-
-#### Force Rerun All Queries
-- Use the `rerun_all` parameter to force rerun all queries:
-
-query_manager(query_dir, db_file, output_dir, rerun_all=True)
-
-#### Rerun Specific Queries
-- Use the `rerun_queries` parameter to rerun specific queries:
-
-query_manager(query_dir, db_file, output_dir, rerun_queries=["query1.sql", "query2.sql"])
-
-- This reruns only the specified queries, leaving other outputs untouched.
+The `run_sql_queries` mirrors the structure of the input directory for outputs, 
+ensuring a clean and organized workflow.
 
 ## Installation
 
 Install directly from GitHub:
 
 ```bash
-
+pip install git+https://github.com/Thomas-Rauter/sqlite_query_manager.git@v0.1.0
 ```
+
+## When facing problems
 
 For any issues or feature requests, please open an issue on the [GitHub 
 repository](https://github.com/Thomas-Rauter/sqlite_query_manager).
