@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="sqlite_query_manager",
+    name="sqlite_manager",
     version="0.1.0",
-    description="A package for managing SQL queries on SQLite databases",
+    description="A package for managing SQLite operations",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author="Thomas Rauter",

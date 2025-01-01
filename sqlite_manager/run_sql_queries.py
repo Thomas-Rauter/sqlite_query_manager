@@ -9,9 +9,9 @@ import time
 
 
 def run_sql_queries(
-    query_dir: Union[str, os.PathLike],
     db_file: Union[str, os.PathLike],
-    output_dir: Union[str, os.PathLike],
+    query_dir: Union[str, os.PathLike] = os.path.abspath("./sql_queries"),
+    output_dir: Union[str, os.PathLike] = os.path.abspath("./query_results"),
     rerun_all: bool = False,
     rerun_queries: List[str] = None
 ) -> None:
@@ -22,14 +22,20 @@ def run_sql_queries(
 
     Parameters
     ----------
-    query_dir : str
-        Path to the directory containing SQL query files.
     db_file : str
         Path to the SQLite database file.
-    output_dir : str
-        Path to the output directory for CSV files.
+
+    query_dir : str or Path, optional
+        Path to the directory containing SQL query files. Default is
+        os.path.abspath("./sql_queries")
+
+    output_dir : str or Path, optional
+        Path to the output directory for CSV files. Default is
+        os.path.abspath("./query_results")
+
     rerun_all : bool, optional
         Whether to rerun queries whose output already exists (default is False).
+
     rerun_queries : list of str, optional
         List of specific query filenames to rerun, regardless of existing
          output.
@@ -127,12 +133,28 @@ def run_sql_queries(
                 query = query_file.read()
 
             logger.info(f"Executing query: {sql_file_path}")
-            df = pd.read_sql_query(query, conn)
-            df.to_csv(output_file_path, index=False)
-            logger.info(
-                f"Query executed successfully. Output saved to:"
-                f" {output_file_path}"
+
+            df = pd.read_sql_query(
+                query,
+                conn
             )
+
+            # Ensure the result is tabular and suitable for CSV
+            if df.empty or not isinstance(df, pd.DataFrame):
+                logger.warning(
+                    f"Query executed but returned no results or invalid "
+                    f"structure (must be suitable for .csv file):"
+                    f" {sql_file_path}"
+                )
+            else:
+                df.to_csv(
+                    output_file_path,
+                    index=False
+                )
+                logger.info(
+                    f"Query executed successfully. Output saved to:"
+                    f" {output_file_path}"
+                )
 
         except Exception as e:
             logger.error(f"Error executing query: {sql_file_path}. Error: {e}")
