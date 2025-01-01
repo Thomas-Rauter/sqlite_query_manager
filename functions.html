@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -233,7 +233,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -241,6 +241,125 @@
         <article role="main" id="furo-main-content">
           <section id="function-reference">
 <h1>Function Reference<a class="headerlink" href="#function-reference" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sqlite_manager.create_sqlite_db">
+<span class="sig-prename descclassname"><span class="pre">sqlite_manager.</span></span><span class="sig-name descname"><span class="pre">create_sqlite_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#sqlite_manager.create_sqlite_db" title="Link to this definition">¶</a></dt>
+<dd><p>Create an SQLite database using a schema file and load data from a pandas
+DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – The data to be loaded into the database.</p></li>
+<li><p><strong>schema_file</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>os.PathLike</em><em>]</em>) – Path to the SQL file containing the schema definition. Default is
+‘db_schema.sql’.</p></li>
+<li><p><strong>db_file</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>os.PathLike</em><em>]</em><em>, </em><em>optional</em>) – Path to the SQLite database file to be created.
+Defaults to ‘./database.db’.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sqlite_manager</span> <span class="kn">import</span> <span class="n">create_sqlite_db</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Charlie&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">35</span><span class="p">]</span>
+<span class="p">}</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">schema_file</span> <span class="o">=</span> <span class="s2">&quot;db_schema.sql&quot;</span>
+<span class="c1"># Example schema (contents of db_schema.sql)</span>
+<span class="c1"># CREATE TABLE ExampleTable (</span>
+<span class="c1">#     id INTEGER PRIMARY KEY,</span>
+<span class="c1">#     name TEXT,</span>
+<span class="c1">#     age INTEGER</span>
+<span class="c1"># );</span>
+
+<span class="n">db_file</span> <span class="o">=</span> <span class="s2">&quot;example_database.db&quot;</span>
+
+<span class="n">create_sqlite_db</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">schema_file</span><span class="p">,</span> <span class="n">db_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sqlite_manager.run_sql_queries">
+<span class="sig-prename descclassname"><span class="pre">sqlite_manager.</span></span><span class="sig-name descname"><span class="pre">run_sql_queries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rerun_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rerun_queries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#sqlite_manager.run_sql_queries" title="Link to this definition">¶</a></dt>
+<dd><p>Execute all SQL queries in a directory (including subdirectories) on a
+SQLite database. Output results as CSV files mirroring the SQL directory
+structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db_file</strong> (<em>str</em><em> or </em><em>Path</em>) – The path to the SQLite database file.</p></li>
+<li><p><strong>query_dir</strong> (<em>str</em><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Path to the directory containing SQL query files. Default is
+os.path.abspath(“./sql_queries”)</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Path to the output directory for CSV files. Default is
+os.path.abspath(“./query_results”)</p></li>
+<li><p><strong>rerun_all</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to rerun queries whose output already exists (default is False).</p></li>
+<li><p><strong>rerun_queries</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>List of specific query filenames to rerun, regardless of existing</dt><dd><p>output.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sqlite_manager</span> <span class="kn">import</span> <span class="n">run_sql_queries</span>
+
+<span class="n">query_dir</span> <span class="o">=</span> <span class="s2">&quot;sql_queries&quot;</span>          <span class="c1"># Directory containing SQL files</span>
+<span class="n">db_file</span> <span class="o">=</span> <span class="s2">&quot;data/online_retail.db&quot;</span>  <span class="c1"># SQLite database file</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="s2">&quot;output&quot;</span>              <span class="c1"># Directory to store query results</span>
+
+<span class="c1"># Run all queries, skipping those with existing outputs</span>
+<span class="n">run_sql_queries</span> <span class="p">(</span>
+  <span class="n">query_dir</span><span class="p">,</span>
+  <span class="n">db_file</span><span class="p">,</span>
+  <span class="n">output_dir</span>
+<span class="p">)</span>
+
+<span class="c1"># Rerun all queries regardless of existing outputs</span>
+<span class="n">run_sql_queries</span> <span class="p">(</span>
+  <span class="n">query_dir</span><span class="p">,</span>
+  <span class="n">db_file</span><span class="p">,</span>
+  <span class="n">output_dir</span><span class="p">,</span>
+  <span class="n">rerun_all</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Rerun specific queries</span>
+<span class="n">run_sql_queries</span> <span class="p">(</span>
+  <span class="n">query_dir</span><span class="p">,</span>
+  <span class="n">db_file</span><span class="p">,</span>
+  <span class="n">output_dir</span><span class="p">,</span>
+  <span class="n">rerun_queries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;query1.sql&quot;</span><span class="p">,</span> <span class="s2">&quot;query2.sql&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># # Input directory</span>
+<span class="c1"># sql_queries/</span>
+<span class="c1"># ├── major_task_1/</span>
+<span class="c1"># │   ├── query1.sql</span>
+<span class="c1"># │   ├── query2.sql</span>
+<span class="c1"># ├── major_task_2/</span>
+<span class="c1"># │   ├── query3.sql</span>
+<span class="c1"># │   └── query4.sql</span>
+<span class="c1">#</span>
+<span class="c1"># # Output Directory (Query Results):</span>
+<span class="c1"># output/</span>
+<span class="c1"># ├── major_task_1/</span>
+<span class="c1"># │   ├── query1.csv</span>
+<span class="c1"># │   ├── query2.csv</span>
+<span class="c1"># ├── major_task_2/</span>
+<span class="c1"># │   ├── query3.csv</span>
+<span class="c1"># │   └── query4.csv</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 
         </article>
@@ -278,8 +397,28 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Function Reference</a><ul>
+<li><a class="reference internal" href="#sqlite_manager.create_sqlite_db"><code class="docutils literal notranslate"><span class="pre">create_sqlite_db()</span></code></a></li>
+<li><a class="reference internal" href="#sqlite_manager.run_sql_queries"><code class="docutils literal notranslate"><span class="pre">run_sql_queries()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
