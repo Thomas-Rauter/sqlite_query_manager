@@ -19,7 +19,6 @@ The `sqlite_manager` package streamlines SQLite database workflows by offering t
 
 1. **Database Creation**:
    - Generate an SQLite database directly from a pandas DataFrame and a schema file.
-   - Automate schema creation and data population, minimizing manual effort.
 
 2. **Query Execution**:
    - Recursively execute SQL queries stored in directories on the database.

@@ -32,11 +32,11 @@ jobs:
       # Step 4: Build the documentation
       - name: Build Sphinx documentation
         run: |
-          sphinx-build -b html docs/source docs/_build/html
+          sphinx-build -b html docs/source docs/build/html
 
       # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build/html
+          publish_dir: docs/build/html
