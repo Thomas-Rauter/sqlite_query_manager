@@ -10,8 +10,8 @@ import time
 
 def run_sql_queries(
     db_file: Union[str, os.PathLike],
-    query_dir: Union[str, os.PathLike] = os.path.abspath("./sql_queries"),
-    output_dir: Union[str, os.PathLike] = os.path.abspath("./query_results"),
+    query_dir: Union[str, os.PathLike] = None,
+    output_dir: Union[str, os.PathLike] = None,
     rerun_all: bool = False,
     rerun_queries: List[str] = None
 ) -> None:
@@ -22,8 +22,8 @@ def run_sql_queries(
 
     Parameters
     ----------
-    db_file : str
-        Path to the SQLite database file.
+    db_file : str or Path
+        The path to the SQLite database file.
 
     query_dir : str or Path, optional
         Path to the directory containing SQL query files. Default is
@@ -43,7 +43,63 @@ def run_sql_queries(
     Returns
     -------
     None
+
+    Examples
+    --------
+    .. code-block:: python
+
+        from sqlite_manager import run_sql_queries
+
+        query_dir = "sql_queries"          # Directory containing SQL files
+        db_file = "data/online_retail.db"  # SQLite database file
+        output_dir = "output"              # Directory to store query results
+
+        # Run all queries, skipping those with existing outputs
+        run_sql_queries (
+          query_dir,
+          db_file,
+          output_dir
+        )
+
+        # Rerun all queries regardless of existing outputs
+        run_sql_queries (
+          query_dir,
+          db_file,
+          output_dir,
+          rerun_all=True
+        )
+
+        # Rerun specific queries
+        run_sql_queries (
+          query_dir,
+          db_file,
+          output_dir,
+          rerun_queries=["query1.sql", "query2.sql"]
+        )
+
+        # # Input directory
+        # sql_queries/
+        # ├── major_task_1/
+        # │   ├── query1.sql
+        # │   ├── query2.sql
+        # ├── major_task_2/
+        # │   ├── query3.sql
+        # │   └── query4.sql
+        #
+        # # Output Directory (Query Results):
+        # output/
+        # ├── major_task_1/
+        # │   ├── query1.csv
+        # │   ├── query2.csv
+        # ├── major_task_2/
+        # │   ├── query3.csv
+        # │   └── query4.csv
     """
+    if query_dir is None:
+        query_dir = os.path.abspath("./sql_queries")
+    if output_dir is None:
+        output_dir = os.path.abspath("./query_results")
+
     validate_inputs(
         query_dir=query_dir,
         db_file=db_file,

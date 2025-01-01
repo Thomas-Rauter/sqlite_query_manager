@@ -1,10 +1,19 @@
+import os
 from setuptools import setup, find_packages
+
+# Ensure the README file is read from the correct directory
+this_directory = os.path.abspath(os.path.dirname(__file__))
+readme_path = os.path.join(this_directory, "README.md")
+
+# Read the README file
+with open(readme_path, "r", encoding="utf-8") as f:
+    long_description = f.read()
 
 setup(
     name="sqlite_manager",
     version="0.1.0",
     description="A package for managing SQLite operations",
-    long_description=open("README.md").read(),
+    long_description=long_description,
     long_description_content_type="text/markdown",
     author="Thomas Rauter",
     author_email="rauterthomas0@gmail.com",

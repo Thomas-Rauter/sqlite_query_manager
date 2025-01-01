@@ -6,10 +6,8 @@ from typing import Union
 
 def create_sqlite_db(
         df: pd.DataFrame,
-        schema_file: Union[str, os.PathLike] = os.path.abspath(
-            "./db_schema.sql"
-        ),
-        db_file: Union[str, os.PathLike] = os.path.abspath("./database.db")
+        schema_file: Union[str, os.PathLike] = None,
+        db_file: Union[str, os.PathLike] = None,
 ) -> None:
     """
     Create an SQLite database using a schema file and load data from a pandas
@@ -27,7 +25,38 @@ def create_sqlite_db(
     db_file : Union[str, os.PathLike], optional
         Path to the SQLite database file to be created.
         Defaults to './database.db'.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        import pandas as pd
+        from sqlite_manager import create_sqlite_db
+
+        data = {
+            "id": [1, 2, 3],
+            "name": ["Alice", "Bob", "Charlie"],
+            "age": [25, 30, 35]
+        }
+        df = pd.DataFrame(data)
+
+        schema_file = "db_schema.sql"
+        # Example schema (contents of db_schema.sql)
+        # CREATE TABLE ExampleTable (
+        #     id INTEGER PRIMARY KEY,
+        #     name TEXT,
+        #     age INTEGER
+        # );
+
+        db_file = "example_database.db"
+
+        create_sqlite_db(df, schema_file, db_file)
     """
+    if schema_file is None:
+        schema_file = os.path.abspath("./db_schema.sql")
+    if db_file is None:
+        db_file = os.path.abspath("./database.db")
+
     # Check if the database file already exists
     if os.path.exists(db_file):
         raise FileExistsError(
