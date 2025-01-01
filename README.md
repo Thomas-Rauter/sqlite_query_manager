@@ -1,32 +1,36 @@
-# SQLite Query Manager
+# SQLite Manager
 
-`sqlite_manager` is a Python package designed to efficiently manage and 
-execute SQL queries on SQLite databases. The package supports organizing SQL queries in directories, running them sequentially or selectively, and exporting the results as CSV files. It also includes flexible options to rerun all queries, specific queries, or skip those with existing outputs.
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Unit Test Status](https://github.com/Thomas-Rauter/sqlite_manager/actions/workflows/test.yml/badge.svg)
+
+
+`sqlite_manager` is a Python package designed to streamline SQLite database 
+creation from dataframes and query execution workflows.
 
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Usage](#usage)
-  - [Directory Layouts](#directory-layouts)
+- [Documentation](#documentation)
 - [Installation](#installation)
-
----
 
 ## Introduction
 
-The `sqlite_manager` package simplifies SQL query execution workflows by:
-- Recursively processing SQL queries from directories.
-- Mirroring directory structures for outputs.
-- Avoiding redundant execution of queries unless explicitly specified.
-- Logging all execution details and errors.
+The `sqlite_manager` package streamlines SQLite database workflows by offering two primary functionalities:
 
-This makes it ideal for projects involving multiple interdependent queries, such as data pipelines and analytics workflows.
+1. **Database Creation**:
+   - Generate an SQLite database directly from a pandas DataFrame and a schema file.
+   - Automate schema creation and data population, minimizing manual effort.
 
----
+2. **Query Execution**:
+   - Recursively execute SQL queries stored in directories on the database.
+   - Automatically mirror directory structures for query results, outputting them as CSV files.
+   - Avoid redundant query execution unless explicitly requested, saving time and computational resources.
+   - Log all execution details and errors for easy debugging and traceability.
 
-## Usage
+## Documentation
 
-
+Check out the [webpage](https://thomas-rauter.github.io/sqlite_manager/) for the
+documentation.
 
 ## Installation
 
