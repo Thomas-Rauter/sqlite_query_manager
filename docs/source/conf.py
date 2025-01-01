@@ -36,4 +36,4 @@ html_theme = "furo"
 html_theme_options = {
     "sidebar_hide_name": True,  # Hide the project name in the sidebar
 }
-html_static_path = ['_static']
+html_static_path = []
