@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"  # Adjust to your preferred Python version
+          python-version: "3.12"  # Adjust to your preferred Python version
 
       # Step 3: Set PYTHONPATH
       - name: Set PYTHONPATH
@@ -33,6 +33,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install sphinx furo  # Add any additional dependencies here
           pip install .  # Install your module
+
+      - name: Debug sqlite_manager import
+        run: python -c "import sqlite_manager; print(sqlite_manager.__doc__)"
 
       # Step 5: Build the documentation
       - name: Build Sphinx documentation
