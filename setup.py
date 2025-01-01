@@ -24,7 +24,7 @@ setup(
         "pandas>=2.0.0",
         "tqdm>=4.5.0",
     ],
-    python_requires=">=3.7",             # Minimum Python version
+    python_requires=">=3.8",             # Minimum Python version
     classifiers=[                        # Metadata for PyPI
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
