@@ -13,6 +13,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "pandas>=2.0.0",
+        "tqdm>=4.5.0",
     ],
     python_requires=">=3.7",             # Minimum Python version
     classifiers=[                        # Metadata for PyPI

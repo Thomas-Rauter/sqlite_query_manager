@@ -9,7 +9,6 @@ execute SQL queries on SQLite databases. The package supports organizing SQL que
 - [Usage](#usage)
   - [Basic Example](#basic-example)
   - [Directory Layouts](#directory-layouts)
-  - [Rerun Options](#rerun-options)
 - [Installation](#installation)
 
 ---

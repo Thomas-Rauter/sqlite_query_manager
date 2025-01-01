@@ -1,17 +1,19 @@
+from typing import Union, List
 import os
 import sqlite3
 import pandas as pd
 import logging
 from pathlib import Path
-from typing import Union, List
+from tqdm import tqdm
+import time
 
 
 def run_sql_queries(
-        query_dir: Union[str, os.PathLike],
-        db_file: Union[str, os.PathLike],
-        output_dir: Union[str, os.PathLike],
-        rerun_all: bool = False,
-        rerun_queries: List[str] = None
+    query_dir: Union[str, os.PathLike],
+    db_file: Union[str, os.PathLike],
+    output_dir: Union[str, os.PathLike],
+    rerun_all: bool = False,
+    rerun_queries: List[str] = None
 ) -> None:
     """
     Execute all SQL queries in a directory (including subdirectories) on a
@@ -44,20 +46,63 @@ def run_sql_queries(
         rerun_queries=rerun_queries
     )
 
-    # Normalize rerun_queries for comparison
     rerun_queries = set(rerun_queries or [])
-
-    # Configure logging
     logging.basicConfig(
         filename='query_manager.log',
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
     logger = logging.getLogger()
-
     logger.info("Starting SQL query execution process.")
 
-    # Connect to SQLite database
+    # Collect all SQL query files
+    query_files = []
+    for root, _, files in os.walk(query_dir):
+        for file_name in files:
+            if file_name.endswith('.sql'):
+                sql_file_path = os.path.join(
+                    root,
+                    file_name
+                )
+                query_files.append(sql_file_path)
+
+    # Filter queries based on rerun criteria
+    queries_to_execute = []
+    for sql_file_path in query_files:
+        relative_path = os.path.relpath(
+            os.path.dirname(sql_file_path),
+            query_dir
+        )
+
+        target_output_dir = os.path.join(
+            output_dir,
+            relative_path
+        )
+
+        os.makedirs(
+            target_output_dir,
+            exist_ok=True
+        )
+        output_file_path = os.path.join(
+            target_output_dir,
+            f"{Path(sql_file_path).stem}.csv"
+        )
+        if (
+            not os.path.exists(output_file_path) or
+            rerun_all or
+            Path(sql_file_path).name in rerun_queries
+        ):
+            queries_to_execute.append((
+                sql_file_path,
+                output_file_path
+            ))
+
+    if not queries_to_execute:
+        logger.info("No queries to execute. Exiting.")
+        print("No queries to execute.")
+        return
+
+    # Connect to the SQLite database
     try:
         conn = sqlite3.connect(db_file)
         logger.info(f"Connected to database: {db_file}")
@@ -65,57 +110,46 @@ def run_sql_queries(
         logger.error(f"Failed to connect to database: {db_file}. Error: {e}")
         return
 
-    # Walk through the SQL directory structure
-    for root, _, files in os.walk(query_dir):
-        relative_path = os.path.relpath(root, query_dir)
-        target_output_dir = os.path.join(output_dir, relative_path)
+    # Progress bar setup
+    progress = tqdm(
+        total=len(queries_to_execute),
+        desc="Running queries",
+        unit=" query",
+        unit_scale=True
+    )
 
-        # Ensure output subdirectory exists
-        os.makedirs(target_output_dir, exist_ok=True)
+    execution_times = []
 
-        for file_name in files:
-            if file_name.endswith('.sql'):  # Process only .sql files
-                sql_file_path = os.path.join(root, file_name)
-                output_file_path = os.path.join(
-                    target_output_dir,
-                    f"{Path(file_name).stem}.csv"
-                )
+    for sql_file_path, output_file_path in queries_to_execute:
+        start_query_time = time.time()
+        try:
+            with open(sql_file_path, 'r') as query_file:
+                query = query_file.read()
 
-                # Skip if output already exists and rerun_all is False,
-                # unless in rerun_queries
-                if (os.path.exists(output_file_path)
-                        and not rerun_all
-                        and file_name not in rerun_queries):
-                    logger.info(
-                        f"Skipping query (output exists):"
-                        f" {sql_file_path}"
-                    )
-                    continue
+            logger.info(f"Executing query: {sql_file_path}")
+            df = pd.read_sql_query(query, conn)
+            df.to_csv(output_file_path, index=False)
+            logger.info(
+                f"Query executed successfully. Output saved to:"
+                f" {output_file_path}"
+            )
 
-                # Read and execute the SQL query
-                try:
-                    with open(sql_file_path, 'r') as query_file:
-                        query = query_file.read()
+        except Exception as e:
+            logger.error(f"Error executing query: {sql_file_path}. Error: {e}")
 
-                    logger.info(f"Executing query: {sql_file_path}")
-                    df = pd.read_sql_query(query, conn)
+        # Update progress and estimate remaining time
+        query_duration = time.time() - start_query_time
+        execution_times.append(query_duration)
+        avg_time_per_query = sum(execution_times) / len(execution_times)
+        remaining_queries = len(queries_to_execute) - progress.n - 1
+        estimated_time_left = avg_time_per_query * remaining_queries
+        progress.set_postfix_str(f"ETA: {estimated_time_left:.2f}s")
+        progress.update(1)
 
-                    # Save result to CSV
-                    df.to_csv(output_file_path, index=False)
-                    logger.info(
-                        f"Query executed successfully. Output saved to:"
-                        f" {output_file_path}"
-                    )
-
-                except Exception as e:
-                    logger.error(
-                        f"Error executing query:"
-                        f" {sql_file_path}. Error: {e}"
-                    )
-
-    # Close the database connection
+    progress.close()
     conn.close()
     logger.info("SQL query execution process completed.")
+    print("SQL query execution process completed.")
 
 
 def validate_inputs(
@@ -184,7 +218,7 @@ def validate_inputs(
 
     # No need to check if output_dir exists, as it may be created later
 
-    # Validate force_rerun
+    # Validate rerun_all
     if not isinstance(rerun_all, bool):
         raise TypeError(
             f"'force_rerun' must be a boolean."
