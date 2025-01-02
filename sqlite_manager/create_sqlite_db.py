@@ -1,17 +1,20 @@
-import sqlite3
 import pandas as pd
+import sqlite3
 import os
+import logging
 from typing import Union
 
 
 def create_sqlite_db(
         df: pd.DataFrame,
-        schema_file: Union[str, os.PathLike] = None,
-        db_file: Union[str, os.PathLike] = None,
+        schema_file: Union[str, os.PathLike],
+        db_file: Union[str, os.PathLike],
+        table_name: str,
+        log_dir: Union[str, os.PathLike] = None
 ) -> None:
     """
-    Create an SQLite database using a schema file and load data from a pandas
-    DataFrame.
+    Create or update an SQLite database using a schema file and load data into
+    a specified table from a pandas DataFrame.
 
     Parameters
     ----------
@@ -19,13 +22,26 @@ def create_sqlite_db(
         The data to be loaded into the database.
 
     schema_file : Union[str, os.PathLike]
-        Path to the SQL file containing the schema definition. Default is
-        'db_schema.sql'.
+        Path to the SQL file containing the schema definition.
 
-    db_file : Union[str, os.PathLike], optional
-        Path to the SQLite database file to be created.
-        Defaults to './database.db'.
+    db_file : Union[str, os.PathLike]
+        Path to the SQLite database file to be created or updated.
 
+    table_name : str
+        Name of the table to insert the DataFrame into.
+
+    log_dir : Union[str, os.PathLike], optional
+        Directory where the log file is written. Default is the current
+        working directory.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the schema file does not exist.
+
+    ValueError
+        If the specified table name is not found in the schema or the schema
+        does not match the DataFrame structure.
     Examples
     --------
     .. code-block:: python
@@ -33,61 +49,138 @@ def create_sqlite_db(
         import pandas as pd
         from sqlite_manager import create_sqlite_db
 
+        # Define the DataFrame to insert
         data = {
-            "id": [1, 2, 3],
-            "name": ["Alice", "Bob", "Charlie"],
-            "age": [25, 30, 35]
+            "InvoiceNo": ["A001", "A002", "A003"],
+            "StockCode": ["P001", "P002", "P003"],
+            "Description": ["Product 1", "Product 2", "Product 3"],
+            "Quantity": [10, 5, 20],
+            "InvoiceDate": ["2023-01-01", "2023-01-02", "2023-01-03"],
+            "UnitPrice": [12.5, 8.0, 15.0],
+            "CustomerID": ["C001", "C002", "C003"],
+            "Country": ["USA", "UK", "Germany"]
         }
         df = pd.DataFrame(data)
 
-        schema_file = "db_schema.sql"
-        # Example schema (contents of db_schema.sql)
-        # CREATE TABLE ExampleTable (
-        #     id INTEGER PRIMARY KEY,
-        #     name TEXT,
-        #     age INTEGER
+        # Schema file (SQL file defining the database schema)
+        schema_file = "schema.sql"
+        # Contents of schema.sql:
+        # CREATE TABLE IF NOT EXISTS OnlineRetail (
+        #     InvoiceNo TEXT NOT NULL,
+        #     StockCode TEXT NOT NULL,
+        #     Description TEXT,
+        #     Quantity INTEGER NOT NULL,
+        #     InvoiceDate TEXT NOT NULL,
+        #     UnitPrice REAL NOT NULL,
+        #     CustomerID TEXT,
+        #     Country TEXT
         # );
 
-        db_file = "example_database.db"
+        # SQLite database file to create or update
+        db_file = "data/online_retail.db"
 
-        create_sqlite_db(df, schema_file, db_file)
+        # Create or update the database and insert data into the table
+        create_sqlite_db(
+            df=df,
+            schema_file=schema_file,
+            db_file=db_file,
+            table_name="OnlineRetail",
+            log_dir="."  # Optional
+        )
     """
-    if schema_file is None:
-        schema_file = os.path.abspath("./db_schema.sql")
-    if db_file is None:
-        db_file = os.path.abspath("./database.db")
+    if log_dir is None:
+        log_dir = os.getcwd()
 
-    # Check if the database file already exists
-    if os.path.exists(db_file):
-        raise FileExistsError(
-            f"The database file '{db_file}' already exists."
-            f" Please specify a different path or remove the existing file."
-        )
+    os.makedirs(log_dir, exist_ok=True)
 
-    # Create the database and apply the schema
+    # Configure the logging
+    log_file = os.path.join(log_dir, "create_sqlite_db.log")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler()
+        ]
+    )
+
+    # Validate input files
+    if not os.path.exists(schema_file):
+        raise FileNotFoundError(f"Schema file '{schema_file}' not found.")
+
+    # Read and validate schema
+    with open(schema_file, 'r') as file:
+        schema = file.read()
+
+    if (f"CREATE TABLE {table_name}" not in schema
+            and f"CREATE TABLE IF NOT EXISTS {table_name}" not in schema):
+        logging.error(
+            f"Table '{table_name}' is not defined in the schema file.")
+        raise ValueError(
+            f"Table '{table_name}' is not defined in the schema file.")
+
+    # Check if the database already exists
+    db_exists = os.path.exists(db_file)
+
+    # Connect to SQLite database
     conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
     try:
-        with open(schema_file, 'r') as file:
-            schema = file.read()
-        cursor = conn.cursor()
-        cursor.executescript(schema)
-        conn.commit()
-        print(f"Database and schema created at: {db_file}")
+        if not db_exists:
+            logging.info(
+                f"Database does not exist. Creating new database at: {db_file}")
+            conn.executescript(schema)
+            conn.commit()
+            logging.info("Schema applied successfully.")
+        else:
+            logging.info(f"Using existing database at: {db_file}")
+            # Apply the schema in case new tables are defined
+            conn.executescript(schema)
+            conn.commit()
+            logging.info(
+                "Schema re-applied to ensure all definitions are current.")
 
-        # Load the DataFrame into the database
-        table_name = schema.split("CREATE TABLE")[1].split("(")[0].strip()
-        df.to_sql(
-            table_name,
-            conn,
-            if_exists='append',
-            index=False
-        )
-        print(f"Data inserted into table: {table_name}")
+            # Check if the specified table exists
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+            existing_tables = [row[0] for row in cursor.fetchall()]
+            if table_name in existing_tables:
+                logging.info(
+                    f"Table '{table_name}' already exists."
+                    f" Data will be appended."
+                )
+            else:
+                logging.info(
+                    f"Table '{table_name}' was created from the schema.")
+
+        # Validate table schema against DataFrame columns
+        cursor.execute(f"PRAGMA table_info({table_name});")
+        schema_columns = [row[1] for row in cursor.fetchall()]
+        if not schema_columns:
+            raise ValueError(
+                f"Table '{table_name}' does not exist after applying"
+                f" the schema."
+            )
+
+        missing_columns = [col for col in df.columns if
+                           col not in schema_columns]
+        if missing_columns:
+            logging.error(
+                f"Columns in DataFrame not found in table schema:"
+                f" {missing_columns}"
+            )
+            raise ValueError(
+                f"Table schema is missing required columns: {missing_columns}")
+
+        # Insert DataFrame into the specified table
+        df.to_sql(table_name, conn, if_exists='append', index=False)
+        logging.info(f"Inserted {len(df)} rows into table '{table_name}'.")
 
     except sqlite3.Error as e:
-        print(f"SQLite Error: {e}")
+        logging.error(f"SQLite Error: {e}")
         raise
-
+    except ValueError as ve:
+        logging.error(f"Validation Error: {ve}")
+        raise
     finally:
         conn.close()
-        print(f"Database connection closed: {db_file}")
+        logging.info(f"Database connection closed: {db_file}")

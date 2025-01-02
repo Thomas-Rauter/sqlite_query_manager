@@ -27,6 +27,7 @@ class TestRunSQLQueries(unittest.TestCase):
 
         # Set up the logger to use the in-memory handler
         self.logger = logging.getLogger()
+        self.logger.handlers = []  # Clear existing handlers
         self.logger.addHandler(self.log_handler)
         self.logger.setLevel(logging.INFO)
 
@@ -69,6 +70,9 @@ class TestRunSQLQueries(unittest.TestCase):
             f.write("SELECT * FROM test_table;")
 
     def tearDown(self):
+        """
+        Clean up after each test.
+        """
         # Remove the in-memory log handler
         self.logger.removeHandler(self.log_handler)
         self.log_handler.close()
@@ -85,7 +89,8 @@ class TestRunSQLQueries(unittest.TestCase):
             query_dir=self.query_dir,
             db_file=self.db_file,
             output_dir=self.output_dir,
-            rerun_all=True
+            rerun_all=True,
+            log_dir=self.temp_dir.name
         )
 
         # Check the output file
@@ -108,6 +113,12 @@ class TestRunSQLQueries(unittest.TestCase):
             lines[1],
             "CSV content does not match expected data."
         )
+
+        # Validate the logs
+        logs = self.log_stream.getvalue()
+        self.assertIn("Connected to database", logs)
+        self.assertIn("Executing query", logs)
+        self.assertIn("Query executed successfully", logs)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,8 @@ def run_sql_queries(
     query_dir: Union[str, os.PathLike] = None,
     output_dir: Union[str, os.PathLike] = None,
     rerun_all: bool = False,
-    rerun_queries: List[str] = None
+    rerun_queries: List[str] = None,
+    log_dir: Union[str, os.PathLike] = None
 ) -> None:
     """
     Execute all SQL queries in a directory (including subdirectories) on a
@@ -38,7 +39,11 @@ def run_sql_queries(
 
     rerun_queries : list of str, optional
         List of specific query filenames to rerun, regardless of existing
-         output.
+        output.
+
+    log_dir : Union[str, os.PathLike], optional
+        Directory where the log file is written. Default is the current
+        working directory.
 
     Returns
     -------
@@ -58,7 +63,8 @@ def run_sql_queries(
         run_sql_queries (
           query_dir,
           db_file,
-          output_dir
+          output_dir,
+          log_dir="."
         )
 
         # Rerun all queries regardless of existing outputs
@@ -79,19 +85,19 @@ def run_sql_queries(
 
         # # Input directory
         # sql_queries/
-        # ├── major_task_1/
+        # ├── task_1/
         # │   ├── query1.sql
         # │   ├── query2.sql
-        # ├── major_task_2/
+        # ├── task_2/
         # │   ├── query3.sql
         # │   └── query4.sql
         #
         # # Output Directory (Query Results):
         # output/
-        # ├── major_task_1/
+        # ├── task_1/
         # │   ├── query1.csv
         # │   ├── query2.csv
-        # ├── major_task_2/
+        # ├── task_2/
         # │   ├── query3.csv
         # │   └── query4.csv
     """
@@ -99,6 +105,8 @@ def run_sql_queries(
         query_dir = os.path.abspath("./sql_queries")
     if output_dir is None:
         output_dir = os.path.abspath("./query_results")
+    if log_dir is None:
+        log_dir = os.getcwd()
 
     validate_inputs(
         query_dir=query_dir,
@@ -109,10 +117,14 @@ def run_sql_queries(
     )
 
     rerun_queries = set(rerun_queries or [])
+
+    os.makedirs(log_dir, exist_ok=True)
+    # Configure the logging
+    log_file = os.path.join(log_dir, "query_manager.log")
     logging.basicConfig(
-        filename='query_manager.log',
+        filename=log_file,
         level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(levelname)s - %(message)s"
     )
     logger = logging.getLogger()
     logger.info("Starting SQL query execution process.")
