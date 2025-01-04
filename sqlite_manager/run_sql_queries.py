@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 from tqdm import tqdm
 import time
+from datetime import datetime
 
 
 def run_sql_queries(
@@ -120,7 +121,8 @@ def run_sql_queries(
 
     os.makedirs(log_dir, exist_ok=True)
     # Configure the logging
-    log_file = os.path.join(log_dir, "query_manager.log")
+    timestamp = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+    log_file = os.path.join(log_dir, f"query_manager_{timestamp}.log")
     logging.basicConfig(
         filename=log_file,
         level=logging.INFO,

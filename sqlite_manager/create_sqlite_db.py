@@ -3,6 +3,7 @@ import sqlite3
 import os
 import logging
 from typing import Union
+from datetime import datetime
 
 
 def create_sqlite_db(
@@ -94,7 +95,8 @@ def create_sqlite_db(
     os.makedirs(log_dir, exist_ok=True)
 
     # Configure the logging
-    log_file = os.path.join(log_dir, "create_sqlite_db.log")
+    timestamp = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+    log_file = os.path.join(log_dir, f"create_sqlite_db_{timestamp}.log")
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
