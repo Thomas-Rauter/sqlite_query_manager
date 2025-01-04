@@ -15,11 +15,12 @@ class TestRunPlotFunctions(unittest.TestCase):
         self.query_results_dir = Path(self.temp_dir) / "query_results"
         self.plot_functions_dir = Path(self.temp_dir) / "plot_functions"
         self.output_dir = Path(self.temp_dir) / "output"
-        self.log_file = Path(self.temp_dir) / "log.txt"
+        self.log_dir = Path(self.temp_dir) / "logs"
 
         self.query_results_dir.mkdir(parents=True, exist_ok=True)
         self.plot_functions_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.log_dir.mkdir(parents=True, exist_ok=True)
 
         # Create a mock CSV file in the query_results directory
         csv_path = self.query_results_dir / "mock_data.csv"
@@ -57,16 +58,21 @@ def plot_mock_data(mock_data, output_dir):
                 query_results_dir=self.query_results_dir,
                 plot_functions_dir=self.plot_functions_dir,
                 output_dir=self.output_dir,
-                log_file=self.log_file,
+                log_dir=self.log_dir,  # Updated argument
                 rerun_all=True
             )
         except Exception as e:
             self.fail(f"run_plot_functions raised an exception: {e}")
 
-        # Verify that the log file is created
+        # Verify that the log directory contains the expected log file
+        log_files = list(self.log_dir.glob("*.log"))
         self.assertTrue(
-            self.log_file.exists(),
-            "Log file was not created."
+            len(log_files) > 0,
+            "No log file was created in the log directory."
+        )
+        self.assertTrue(
+            any("plot_functions_" in log_file.name for log_file in log_files),
+            "Log file with the expected timestamped name was not created."
         )
 
         # Verify that the output file is created

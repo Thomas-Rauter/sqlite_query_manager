@@ -26,6 +26,16 @@ The `sqlite_manager` package streamlines SQLite database workflows by offering t
    - Avoid redundant query execution unless explicitly requested, saving time and computational resources.
    - Log all execution details and errors for easy debugging and traceability.
 
+3. Automated Plot Generation:
+   - Generate plots from query results using Python plotting functions stored 
+   in directories.
+   - Automatically detect and execute plotting functions based on predefined 
+     rules.
+   - Save plots to specified directories, ensuring traceable and reproducible 
+     workflows.
+   - Prevent redundant plot generation, and log all activities for clarity and 
+     debugging.
+
 ## Documentation
 
 Check out the [webpage](https://thomas-rauter.github.io/sqlite_manager/) for the

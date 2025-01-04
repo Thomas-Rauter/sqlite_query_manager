@@ -12,7 +12,7 @@ with open(readme_path, "r", encoding="utf-8") as f:
 setup(
     name="sqlite_manager",
     version="0.1.0",
-    description="A package for managing SQLite operations",
+    description="A package for managing SQLite workflows",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Thomas Rauter",
