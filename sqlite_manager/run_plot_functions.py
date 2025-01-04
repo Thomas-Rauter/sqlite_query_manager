@@ -6,6 +6,7 @@ from tqdm import tqdm
 import logging
 from typing import Dict
 from pathlib import Path
+from datetime import datetime
 
 
 # Exported function definition -------------------------------------------------
@@ -15,7 +16,7 @@ def run_plot_functions(
         query_results_dir: str | Path,
         plot_functions_dir: str | Path,
         output_dir: str | Path,
-        log_file: str | Path,
+        log_dir: str | Path = None,
         rerun_all: bool = False,
         rerun_functions: list[str] | None = None
 ) -> None:
@@ -26,29 +27,83 @@ def run_plot_functions(
     ----------
     query_results_dir : str or Path
         The path to the directory containing .csv results from SQL queries.
+
     plot_functions_dir : str or Path
         The path to the directory containing Python files with plotting
         functions.
+
     output_dir : str or Path
         The path to the directory where the plots should be saved.
-    log_file : str or Path
-        The path to the log file where messages will be saved.
+
+    log_dir : str or Path
+        The directory where the log file should be saved. A timestamped log
+        file will be created automatically. Default is the current working dir.
+
     rerun_all : bool, optional
         Force rerun of all plotting functions, by default False.
+
     rerun_functions : list of str, optional
         List of specific plotting functions to rerun, by default None.
+
+    Examples
+    --------
+    Basic usage:
+
+    Assuming you have a directory structure like this:
+
+    .. code-block:: text
+
+        project/
+        ├── query_results/
+        │   └── data.csv
+        ├── plot_functions/
+        │   └── plot_example.py
+        └── output/
+        └── log.txt
+
+    You can call the function as follows:
+
+    .. code-block:: python
+
+        from pathlib import Path
+        from sqlite_manager.run_plot_functions import run_plot_functions
+
+        run_plot_functions(
+            query_results_dir=Path("project/query_results"),
+            plot_functions_dir=Path("project/plot_functions"),
+            output_dir=Path("project/output"),
+            log_file=Path("project/log.txt"),
+            rerun_all=True
+        )
+
+    This will:
+    - Load all `.csv` files from the `query_results/` directory.
+    - Execute all plotting functions in `plot_functions/`.
+    - Save plots to the `output/` directory.
+    - Log messages to `log.txt`.
     """
+    if log_dir is None:     # Set default value
+        log_dir = Path.cwd()
+
     # Convert string paths to pathlib.Path objects
     query_results_dir = Path(query_results_dir)
     plot_functions_dir = Path(plot_functions_dir)
     output_dir = Path(output_dir)
-    log_file = Path(log_file)
+    log_dir = Path(log_dir)
 
-    # Create output directory if it doesn't exist
-    os.makedirs(
+    os.makedirs(        # Create output directory if it doesn't exist
         output_dir,
         exist_ok=True
     )
+
+    os.makedirs(        # Create log directory if it doesn't exist
+        log_dir,
+        exist_ok=True
+    )
+
+    # Create a timestamped log file name
+    timestamp = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
+    log_file = log_dir / f"plot_functions_{timestamp}.log"
 
     logger = configure_logging(log_file=log_file)
 
