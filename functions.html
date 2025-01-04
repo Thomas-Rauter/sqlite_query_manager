@@ -388,6 +388,56 @@ working directory.</p></li>
 </div>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="sqlite_manager.run_plot_functions">
+<span class="sig-prename descclassname"><span class="pre">sqlite_manager.</span></span><span class="sig-name descname"><span class="pre">run_plot_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_results_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_functions_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rerun_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rerun_functions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#sqlite_manager.run_plot_functions" title="Link to this definition">¶</a></dt>
+<dd><p>Run plotting functions based on query results and instructions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query_results_dir</strong> (<em>str</em><em> or </em><em>Path</em>) – The path to the directory containing .csv results from SQL queries.</p></li>
+<li><p><strong>plot_functions_dir</strong> (<em>str</em><em> or </em><em>Path</em>) – The path to the directory containing Python files with plotting
+functions.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em> or </em><em>Path</em>) – The path to the directory where the plots should be saved.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em> or </em><em>Path</em>) – The directory where the log file should be saved. A timestamped log
+file will be created automatically. Default is the current working dir.</p></li>
+<li><p><strong>rerun_all</strong> (<em>bool</em><em>, </em><em>optional</em>) – Force rerun of all plotting functions, by default False.</p></li>
+<li><p><strong>rerun_functions</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – List of specific plotting functions to rerun, by default None.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Basic usage:</p>
+<p>Assuming you have a directory structure like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>project/
+├── query_results/
+│   └── data.csv
+├── plot_functions/
+│   └── plot_example.py
+└── output/
+└── log.txt
+</pre></div>
+</div>
+<p>You can call the function as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">sqlite_manager.run_plot_functions</span> <span class="kn">import</span> <span class="n">run_plot_functions</span>
+
+<span class="n">run_plot_functions</span><span class="p">(</span>
+    <span class="n">query_results_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;project/query_results&quot;</span><span class="p">),</span>
+    <span class="n">plot_functions_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;project/plot_functions&quot;</span><span class="p">),</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;project/output&quot;</span><span class="p">),</span>
+    <span class="n">log_file</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;project/log.txt&quot;</span><span class="p">),</span>
+    <span class="n">rerun_all</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This will:
+- Load all <cite>.csv</cite> files from the <cite>query_results/</cite> directory.
+- Execute all plotting functions in <cite>plot_functions/</cite>.
+- Save plots to the <cite>output/</cite> directory.
+- Log messages to <cite>log.txt</cite>.</p>
+</dd></dl>
+
 </section>
 
         </article>
@@ -440,6 +490,7 @@ working directory.</p></li>
 <li><a class="reference internal" href="#">Function Reference</a><ul>
 <li><a class="reference internal" href="#sqlite_manager.create_sqlite_db"><code class="docutils literal notranslate"><span class="pre">create_sqlite_db()</span></code></a></li>
 <li><a class="reference internal" href="#sqlite_manager.run_sql_queries"><code class="docutils literal notranslate"><span class="pre">run_sql_queries()</span></code></a></li>
+<li><a class="reference internal" href="#sqlite_manager.run_plot_functions"><code class="docutils literal notranslate"><span class="pre">run_plot_functions()</span></code></a></li>
 </ul>
 </li>
 </ul>
